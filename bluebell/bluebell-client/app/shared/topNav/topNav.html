@@ -1,0 +1,39 @@
+<nav class="navbar navbar-default navbar-fixed-top" data-ng-controller="topNavCtrl">
+    <div class="container nav-container">
+        <button type="button" class="btn btn-default btn-lg menu-glyph" data-ng-click="toggleSideMenu();">
+            <span class="glyphicon glyphicon-nav"></span>
+        </button>
+		<div class="navbar-header logo">
+			<div class="navbar-brand" id="page-caption"></div>
+
+		</div>
+		<ul class="nav navbar-nav navbar-right">
+			<li data-ng-if="role != 'SALES LEAD'"><a href="#/client"><button type="button" class="btn btn-primary bb-button">{{label.createClient}}</button></a></li>
+  			<li data-ng-if="role != 'SALES LEAD'"><a href="javascript:void(0);"><button data-ng-click="createProject()" type="button" class="btn btn-primary bb-button">{{label.createProject}}</button></a></li>
+
+  			<li>
+				<span data-ng-show="showUserDtls" class="popup-close" data-ng-click="showUserDtls = !showUserDtls"></span>
+				<button class="user-avater-outer" data-ng-click="showUserDtls = !showUserDtls" style="background-image: url({{userInfo.employee.imageUrl}}); margin-bottom: 5px; background-repeat: no-repeat;"></button>
+				<div class="popup" data-ng-show="showUserDtls" style="min-width:225px; padding: 15px;">
+					<div class="user-profile clearfix col-md-12" style="padding: 0;">
+						<a href="#" class="user-avater col-md-3" style="background-image: url({{userInfo.employee.imageUrl}}); background-repeat: no-repeat;"> </a>
+						<span class="user-info col-md-9" style="padding: 5px 0 5px 10px">
+							<span>Welcome,</span>
+							<span class="name">{{userInfo.employee.name}}</span>
+							<span data-ng-if="role == 'REGION HEAD'">Region Head</span>
+							<span data-ng-if="role == 'SYSTEM ADMIN'">System Admin</span>
+							<span data-ng-if="role == 'STAFFING MANAGER'">Staffing Manager</span>
+							<span data-ng-if="role == 'STAFFING MANAGER'">SALES LEAD</span>
+							<span data-ng-if="role == 'REGION HEAD'" data-ng-repeat="region in regions">{{region}}</span>
+						</span>
+					</div>
+
+					<a href="javascript:void(0);" class="popup-links col-md-12 role-link" data-ng-repeat="addnRole in addnRoles" data-ng-click="changeRole(addnRole)" ><span class="glyphicon glyphicon-random"></span> View As {{addnRole}}</a>
+					<a data-ng-if="role == 'SYSTEM ADMIN'" href="javascript:void(0);" class="popup-links col-md-12" data-ng-click="assignRole()"><span class="glyphicon glyphicon-user"></span>User Roles</a>
+					<a data-ng-if="role == 'SYSTEM ADMIN'" href="javascript:void(0);" class="popup-links col-md-12" data-ng-click="syncProjects()"><span class="glyphicon glyphicon-android-sync"></span>Sync User Projects to NW</a>
+					<a href="javascript:void(0);" class="popup-links col-md-12" data-ng-click="signOut()"><span class="glyphicon glyphicon-log-out"></span>Logout</a>
+				</div>
+			</li>
+		</ul>
+	</div>
+</nav>

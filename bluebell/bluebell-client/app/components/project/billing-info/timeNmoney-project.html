@@ -1,0 +1,76 @@
+<div class="form-container" data-ng-controller="tnmProjectCtrl">
+	<form name="tnm" action="post" class="form-horizontal" novalidate>
+		
+		<div class="form-group">
+		    <label class="control-label col-md-3">{{label.invoicingStartDate}}</label>
+
+		    <div class="col-md-2" ng-class="{ 'has-error' : tnm.date.$invalid && !tnm.date.$pristine }">
+		    	<div class="input-group date" id="datePicker">
+		    		<input data-ng-model="formData.invoiceInfo.invoiceStartDate" min="{{projectStartDate | date:'yyyy-MM-dd'}}" name="date" type="date" class="form-control" placeholder="YYYY-MM-DD" required>
+		    		<span class="input-group-addon">
+	                    <span class="glyphicon glyphicon-calendar"></span>
+	                </span>
+	            </div>    
+		    	<p ng-show="tnm.date.$error.required && !tnm.date.$pristine" class="help-block">{{errorMessage.invoicingDate_required}}</p>
+		    	<p ng-show="tnm.date.$error.date" class="help-block">{{errorMessage.invoicingDate_invalid}}</p>
+		    	<p ng-show="tnm.date.$error.min" class="help-block">{{errorMessage.invoicingDate_invalid_min}}</p>
+		    </div>
+
+		    <label class="control-label col-md-2">{{label.frequency}}</label>
+		    <div class="col-md-2" ng-class="{ 'has-error' : tnm.cycle.$invalid && !tnm.cycle.$pristine }">
+		    	<select class="form-control" data-ng-model="formData.invoiceInfo.invoiceCycle" name="frequency" required>
+				    <option value="">{{label.selectFrequency}}</option>
+					<option data-ng-repeat="frq in invoiceCycle" value="{{frq}}">{{frq}}</option>
+				</select>
+		    	<p ng-show="tnm.frequency.$invalid && !tnm.frequency.$pristine" class="help-block">{{errorMessage.frequency_required}}</p>
+		    </div>
+		</div>
+
+		<div class="form-group" data-ng-repeat="billingRate in formData.billingRates track by $index">
+		    <label class="col-md-3 control-label" data-ng-show="$index==0">{{label.billingrate}}</label>
+
+		    <div class="col-md-3" data-ng-show="$index > 0">
+		    </div>
+		    
+		    <div class="col-md-2" ng-class="{ 'has-error' : tnm.title{{$index +1}}.$invalid && !tnm.title{{$index +1}}.$pristine }">
+		    	<select class="form-control" data-ng-model="formData.billingRates[$index].title" name="title{{$index +1}}" required>
+				    <option value="">{{label.selectTitle}}</option>
+					<option data-ng-repeat="title in titleList" value="{{title}}">{{title}}</option>
+				</select>
+		    	<p ng-show="tnm.title{{$index +1}}.$invalid && !tnm.title{{$index +1}}.$pristine" class="help-block">{{errorMessage.title_required}}</p>
+		    </div>
+
+		    <div class="col-md-2" ng-class="{ 'has-error' : tnm.currency{{$index +1}}.$invalid && !tnm.currency{{$index +1}}.$pristine }">
+		    	<select class="form-control" name="currency{{$index +1}}" data-ng-model="billingRate.rate.currency" required>
+			        <option value="">{{label.selectCurrency}}</option>
+			        <option data-ng-repeat="currency in currencyList" value="{{currency}}">{{currency}}</option>
+			    </select>
+			    <p ng-show="tnm.currency{{$index +1}}.$invalid && !tnm.currency{{$index +1}}.$pristine" class="help-block">{{errorMessage.currency_required}}</p> 
+		    </div>
+
+		    <div class="col-md-2" ng-class="{ 'has-error' : tnm.rate{{$index +1}}.$invalid && !tnm.rate{{$index +1}}.$pristine }">
+		    	<input data-ng-model="billingRate.rate.amount" name="rate{{$index +1}}" type="number" min="0" class="form-control" placeholder="Rate" required>
+		    	<p ng-show="tnm.rate{{$index +1}}.$error.required && !tnm.rate{{$index +1}}.$pristine" class="help-block">{{errorMessage.rate_required}}</p>
+		    	<p ng-show="tnm.rate{{$index +1}}.$error.number || tnm.rate{{$index +1}}.$error.min" class="help-block">{{errorMessage.rate_invalid}}</p>
+		    </div>
+
+		    <div class="col-md-3" style="text-align:left;padding:8px">
+		    	<a href="javascript:void(0);" data-ng-click="removeRate($index)"><span class="glyphicon glyphicon-remove" title="{{label.remove}}"></span></a>
+		    </div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-md-3"></div>
+			<div class="col-md-3" style="text-align:left;">
+		    	<a href="javascript:void(0);" data-ng-click="addRate()"><span class="glyphicon glyphicon-plus-sign"></span> {{label.addResourceRate}}</a>
+		    </div>
+		</div>
+
+		<div class="form-group">
+			<input type="button" class="btn bb-button bb-button-secondary" value="Go Back" data-ng-click="goBack()"> 
+		    <input type="button" data-ng-show="mode == 'CREATE'" ng-disabled="tnm.$invalid" class="btn btn-primary bb-button" value="Continue" data-ng-click="continue()"> 
+		    <!--<input type="button" data-ng-show="mode == 'UPDATE'" ng-disabled="tnm.$invalid" class="btn btn-primary bb-button" value="Update" data-ng-click="update()"> -->
+		    <input type="button" data-ng-show="mode == 'UPDATE'" ng-disabled="tnm.$invalid" class="btn btn-primary bb-button" value="Finish" data-ng-click="update()">
+		</div>
+	</form>
+</div>

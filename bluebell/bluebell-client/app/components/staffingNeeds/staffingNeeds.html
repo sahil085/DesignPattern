@@ -1,0 +1,902 @@
+<style>
+    .alert-dark {
+        color: #1b1e21;
+        background-color: #d6d8d9;
+        border-color: #c6c8ca;
+    }
+    .border-dark {
+        border-color: #343a40!important;
+    }
+    .border {
+        border: 1px solid #dee2e6!important;
+    }
+</style>
+<div data-ng-controller="staffingNeedsCtrl">
+    <ul class="nav nav-tabs">
+        <li class="{{allocatedActive}}" data-ng-click="showAllocationOrDeallocationProjectStaffing(1)"><a
+                href="javascript:void(0);"><h4>{{label.allocationTab}}</h4></a></li>
+        <li class="{{openNeedActive}}" data-ng-click="showAllocationOrDeallocationProjectStaffing(2)"><a
+                href="javascript:void(0);"><h4>{{label.openNeedTab}}</h4></a></li>
+        <li class="{{deAllocationActive}}"
+            data-ng-click="showAllocationOrDeallocationProjectStaffing(3)"><a
+                href="javascript:void(0);"><h4>{{label.deAllocationTab}}</h4></a></li>
+    </ul>
+    <div>
+        <div style="text-align:center;" data-ng-show="showAlertMessage">
+            <div class="alert alert-success" style="display:inline;">
+                {{message}}
+            </div>
+        </div>
+    </div>
+    <div class="mt-40" data-ng-show="needTabFlag==1">
+        <div class=" mt-20" style="overflow: visible;">
+            <div class="col-md-4 title-container" style="margin-bottom:20px; padding:0;">
+                <div style="display:inline-block;">
+                    <h4 style="margin:0;">{{label.page_title}} {{projectName}} ({{projectId}})</h4>
+                    <div class="title-border" style="float:none;"></div>
+                </div>
+            </div>
+            <div class="col-md-2" style="float: right; padding: 0;margin-left: 2px">
+                <select class="form-control " data-ng-change="competencyChanged(true)"
+                        data-ng-model="competencyAlloction" required>
+                    <option value="">All Competency</option>
+                    <option data-ng-repeat="competencyAlloction in competencyList" value="{{competencyAlloction}}">
+                        {{competencyAlloction}}
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-2" style="float: right; padding: 0; margin-right: 10px;">
+                <input class="form-control" type="text" placeholder="Search" data-ng-model="staffingDetailsSearchText">
+            </div>
+           <!-- <div class="col-md-3" style="float: right; padding: 0;margin-left: 2px">
+                <span class="alert border border-dark">Billable</span>
+                <span class="alert alert-warning">Non-Billable</span>
+                &lt;!&ndash;<span class="alert alert-dark">Shadow</span>&ndash;&gt;
+            </div>-->
+            <form name="staffReq" novalidate>
+                <table class="table table-bold-head bbdatatable table-condensed "
+                       id="staffingNeed">
+                    <thead>
+                    <tr>
+                        <th ng-click="sortedList('allocatedStaffing.employeeName',true)" style="cursor: pointer"
+                            class="w15">{{label.employee_name}}<span
+                                class="{{(property=='allocatedStaffing.employeeName')?sortingclass:''}}"></span>
+                        </th>
+                        <th ng-click="sortedList('allocatedStaffing.employeeCode',true)" style="cursor: pointer"
+                            class="w7">{{label.employee_code}}<span
+                                class="{{(property=='allocatedStaffing.employeeCode')?sortingclass:''}}"></span>
+                        </th>
+
+                        <th ng-click="sortedList('title',true)" style="cursor: pointer" class="w9">
+                            {{label.title}}<span class="{{(property=='title')?sortingclass:''}}"></span></th>
+                        <th ng-click="sortedList('competency',true)" style="cursor: pointer" class="w11">
+                            {{label.competency}}<span class="{{(property=='competency')?sortingclass:''}}"></span>
+                        </th>
+                        <th ng-click="sortedList('allocatedStaffing.mentovisor.name',true)" style="cursor: pointer"
+                            class="w9">{{label.mentovisor}}<span
+                                class="{{(property=='allocatedStaffing.mentovisor.name')?sortingclass:''}}"></span>
+                        </th>
+                        <th ng-click="sortedList('allocatedStaffing.mentovisor.menteeRegion',true)"
+                            style="cursor: pointer" class="w9">{{label.region}}<span
+                                class="{{(property=='allocatedStaffing.mentovisor.menteeRegion')?sortingclass:''}}"></span>
+                        </th>
+                        <th ng-click="sortedList('startDate',true)" style="cursor: pointer" class="w15">
+                            {{label.startdate}}<span class="{{(property=='startDate')?sortingclass:''}}"></span>
+                        </th>
+                        <th ng-click="sortedList('endDate',true)" style="cursor: pointer" class="w15">
+                            {{label.endDate}}<span class="{{(property=='endDate')?sortingclass:''}}"></span></th>
+                        <th ng-click="sortedList('billableType',true)" style="cursor: pointer" class="w15">
+                            {{label.billable}}<span class="{{(property=='billableType')?sortingclass:''}}"></span></th>
+                        <th ng-click="sortedList('allocation',true)" style="cursor: pointer" class="w11"
+                            title="Allocation Percentage">{{label.allocation}}<span
+                                class="{{(property=='allocation')?sortingclass:''}}"></span></th>
+                        <th class="w4">{{label.action}}</th>
+                        <th class="w4"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-ng-if="allocatedList.length==0">
+                        <td colspan="10">No Staff Allocated to this Project</td>
+                    </tr>
+                    <tr data-ng-repeat-start="projectStaff in currAllocationList  track by $index"
+                        data-ng-if="row[$index]" class="loading">
+                        <td colspan="10">&nbsp;</td>
+                    </tr>
+                    <tr data-ng-hide="row[$index] || erow[$index]">
+                        <td>
+                            {{projectStaff.allocatedStaffing.employeeName}}
+                            <span data-ng-if="projectStaff.resign" style="margin-left: 1px;cursor: pointer"
+                                  class="badge badge-pill alert-danger"
+                                  data-ng-click="resigntionDetails(projectStaff)">Resigned</span>
+                        </td>
+                        <td>{{projectStaff.allocatedStaffing.employeeCode}}</td>
+                        <td>{{projectStaff.title}}</td>
+                        <td style="padding-left: 2%">{{projectStaff.competency}}</td>
+                        <td data-ng-click="changeMentovisor(projectStaff.allocatedStaffing)"
+                            style="cursor: pointer">{{projectStaff.allocatedStaffing.mentovisor.name}}
+                        </td>
+                        <td>{{projectStaff.allocatedStaffing.mentovisor.menteeRegion}}</td>
+                        <td>{{projectStaff.startDate | date:'dd-MMM-yy'}}</td>
+                        <td>{{projectStaff.endDate | date:'dd-MMM-yy'}}</td>
+                        <td>
+                            <span data-ng-if="projectStaff.billableType === 'BILLABLE'">{{label.billable}}</span>
+                            <span data-ng-if="projectStaff.billableType === 'NON_BILLABLE'">{{label.nonBillable}}</span>
+                            <span data-ng-if="projectStaff.billableType === 'SHADOW'">{{label.shadow}}</span>
+                        </td>
+                        <td>{{projectStaff.allocation}}%</td>
+                        <td class="glyph">
+                            <button title="{{label.edit}}" class="btn btn-xs btn-primary"
+                                    data-ng-click="initObjForEdit($index)" data-ng-disabled="empAllUpdateActive">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                        </td>
+                        <td class="glyph">
+                            <button title="{{label.deallocate}}" class="btn btn-xs btn-danger"
+                                    data-ng-click="deAllocate(projectStaff.allocatedStaffing.email, projectStaff.id,projectStaff.allocatedStaffing,projectStaff.startDate)">
+                                <span class="glyphicon glyphicon-minus"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr data-ng-repeat-end data-ng-if="erow[$index]">
+                        <td>{{projectStaff.allocatedStaffing.employeeName}}</td>
+                        <td>{{projectStaff.allocatedStaffing.employeeCode}}</td>
+                        <td>{{projectStaff.title}}</td>
+                        <td style="padding-left: 2%">{{projectStaff.competency}}</td>
+                        <td>{{projectStaff.allocatedStaffing.mentovisor.name}}</td>
+                        <td>{{projectStaff.allocatedStaffing.mentovisor.menteeRegion}}</td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (staffReq.startdate.$invalid && !staffReq.startdate.$pristine) || (staffReq.startdate.$invalid && submitted) }">
+                                <div id="startDatePicker" class="input-group date">
+                                    <input name="startdate" type="date"
+                                           min="{{projectStartDate | date:'yyyy-MM-dd'}}"
+                                           max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                           class="form-control input-sm" placeholder="YYYY-MM-DD"
+                                           data-ng-model="staff.startDate" required>
+                                    <span class="input-group-addon adjustSpan"
+                                          elem-ready="enableCalender('startDatePicker', 'startdate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                                </div>
+                                <p ng-show="staffReq.startdate.$error.date" class="help-block">
+                                    {{errorMessage.date_invalid}}</p>
+                                <p ng-show="staffReq.startdate.$error.min" class="help-block">
+                                    {{errorMessage.startdate_invalid_min}}</p>
+                                <p ng-show="staffReq.startdate.$error.max" class="help-block">
+                                    {{errorMessage.startdate_invalid_max}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (staffReq.enddate.$invalid && !staffReq.enddate.$pristine ) || (staffReq.enddate.$invalid && submitted)}">
+                                <div id="endDatePicker" class="input-group date">
+                                    <input name="enddate" type="date" min="{{staff.startDate | date:'yyyy-MM-dd'}}"
+                                           max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                           class="form-control input-sm" placeholder="YYYY-MM-DD"
+                                           data-ng-model="staff.endDate" required>
+                                    <span class="input-group-addon adjustSpan"
+                                          elem-ready="enableCalender('endDatePicker', 'enddate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                                </div>
+                                <p ng-show="staffReq.enddate.$error.date" class="help-block">
+                                    {{errorMessage.date_invalid}}</p>
+                                <p ng-show="staffReq.enddate.$error.min" class="help-block">
+                                    {{errorMessage.enddate_invalid_min}}</p>
+                                <p ng-show="staffReq.enddate.$error.max" class="help-block">
+                                    {{errorMessage.enddate_invalid_max}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <select class="form-control input-sm" name="billableType"
+                                        data-ng-model="projectStaff.billableType" required>
+                                    <option value="BILLABLE" ng-selected="projectStaff.billableType === 'BILLABLE'">
+                                        {{label.billable}}
+                                    </option>
+                                    <option value="NON_BILLABLE"
+                                            ng-selected="projectStaff.billableType === 'NON_BILLABLE'">
+                                        {{label.nonBillable}}
+                                    <option value="SHADOW" ng-selected="projectStaff.billableType === 'SHADOW'">
+                                        {{label.shadow}}
+                                    </option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (staffReq.allocation.$invalid && !staffReq.allocation.$pristine ) || (staffReq.allocation.$invalid && submitted)}">
+                                <input name="allocation" type="number" min="0" max="100"
+                                       class="form-control input-sm" placeholder="% Allocation"
+                                       data-ng-model="staff.allocation" required>
+                                <p ng-show="staffReq.allocation.$error.number" class="help-block">
+                                    {{errorMessage.allocation_invalid}}</p>
+                                <p ng-show="staffReq.allocation.$error.min || staffReq.allocation.$error.max"
+                                   class="help-block">{{errorMessage.allocation_invalid_minmax}}</p>
+                            </div>
+                        </td>
+                        <td class="glyph">
+                            <button title="{{label.add}}" data-ng-click="doneEdit($index,projectStaff)"
+                                    type="button" class="btn btn-xs btn-success">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                        </td>
+                        <td class="glyph" style="text-align: left;">
+                            <button title="{{label.cancel}}" data-ng-click="cancelEdit($index)" type="button"
+                                    class="btn btn-xs btn-danger">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style="display: inline-block; color: #999999;margin-left: 5px;">Total: {{allocatedList.length}}
+                    record(s)
+                </div>
+                <div class="pagination-wrap col-md-12" data-ng-show="allocatedList.length > itemPerPage"
+                     style="padding:0;">
+                    <pagination
+                            data-ng-model="currAllocationPage"
+                            items-per-page="itemPerPage"
+                            total-items="allocatedList.length"
+                            max-size="maxSize"
+                            boundary-links="true"
+                            class="dboard-paginate"
+                    >
+                    </pagination>
+                    <div class="clear:both;"></div>
+                </div>
+            </form>
+            <div class="form-group">
+                <a href="javascript:void(0);">
+                    <button type="button" class="btn bb-button bb-button-secondary" data-ng-click="goBack()">Go Back
+                    </button>
+                </a>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div class="mt-40" data-ng-show="needTabFlag==2">
+        <div class="table-responsive  mt-20" style="overflow: visible;">
+
+            <div class="col-md-6 title-container" style="margin-bottom:20px; padding:0;">
+                <div style="display:inline-block;">
+                    <h3 style="margin:0;">{{label.open_needs}}</h3>
+                    <div class="title-border" style="float:none;"></div>
+                </div>
+            </div>
+            <button style="float:right; margin-top: 15px; margin-right: 5px;" class="btn btn-primary btn-sm"
+                    data-ng-click="addNewStaffReq(0)">
+                <span class="glyphicon glyphicon-plus"></span>
+                <a href="javascript:void(0);" style="color: #FFFFFF">Add Need</a>
+            </button>
+            <div class="col-md-12" style="float: right; padding: 0">
+                <div class="col-md-2" style="float: right; padding: 0;margin-bottom: 5px">
+                    <select class="form-control " data-ng-change="competencyChanged(false)"
+                            data-ng-model="competencyDeAlloction" required>
+                        <option value="">All Competency</option>
+                        <option data-ng-repeat="competencyDeAlloction in competencyList"
+                                value="{{competencyDeAlloction}}">{{competencyDeAlloction}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2" style="float: right; padding: 0; margin-right: 10px;">
+                    <input class="form-control" type="text" placeholder="Search" data-ng-model="opneNeedSearchText">
+                </div>
+            </div>
+            <form name="openStaffReq" novalidate>
+                <table class="table table-hover table-bold-head table-striped  bbdatatable table-condensed"
+                       id="openNeeds">
+                    <thead>
+                    <tr>
+                        <th ng-click="sortedList('title',false)" style="cursor: pointer" class="w11">
+                            {{label.title}}<span
+                                class="{{(property=='title')?sortingclass:''}}"></span></th>
+                        <th ng-click="sortedList('competency',false)" style="cursor: pointer" class="w18">
+                            {{label.competency}}<span class="{{(property=='competency')?sortingclass:''}}"></span>
+                        </th>
+                        <th ng-click="sortedList('startDate',false)" style="cursor: pointer" class="w16">
+                            {{label.startdate}}<span class="{{(property=='startDate')?sortingclass:''}}"></span>
+                        </th>
+                        <th ng-click="sortedList('endDate',false)" style="cursor: pointer" class="w18">
+                            {{label.endDate}}<span class="{{(property=='endDate')?sortingclass:''}}"></span></th>
+                        <th class="w11">{{label.billingType}}</th>
+                        <th ng-click="sortedList('allocation',false)" style="cursor: pointer" class="w18">
+                            {{label.allocation}}<span class="{{(property=='allocation')?sortingclass:''}}"></span>
+                        </th>
+                        <th ng-click="sortedList('details',false)" style="cursor: pointer" class="w13">
+                            {{label.details}}<span class="{{(property=='details')?sortingclass:''}}"></span></th>
+                        <th class="w12">{{label.status}}</th>
+                        <th class="w7">{{label.action}}</th>
+                        <th class="w7"></th>
+                        <th class="w4"></th>
+                        <th class="w4"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-ng-if="currUnAllocList.length==0 && !addNew[0]">
+                        <td colspan="12">No Open Needs for this Project</td>
+                    </tr>
+
+                    <tr data-ng-if="osrRow[0]" class="loading">
+                        <td colspan="12">&nbsp;</td>
+                    </tr>
+
+                    <tr data-ng-if="addNew[0] && currUnAllocList.length==0">
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.title.$invalid && !openStaffReq.title.$pristine) || (openStaffReq.title.$invalid && formSubmitted) }">
+                                <select class="form-control input-sm" name="title" data-ng-model="newStaffReq.title"
+                                        required>
+                                    <option value="">{{label.selectTitle}}</option>
+                                    <option data-ng-repeat="title in titleList" value="{{title}}">{{title}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.competency.$invalid && !openStaffReq.competency.$pristine) || (openStaffReq.competency.$invalid && formSubmitted)}">
+                                <select class="form-control input-sm" name="competency"
+                                        data-ng-model="newStaffReq.competency" required>
+                                    <option value="">{{label.selectCompetency}}</option>
+                                    <option data-ng-repeat="comp in competencies" value="{{comp}}">{{comp}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.startdate.$invalid && !openStaffReq.startdate.$pristine) || (openStaffReq.startdate.$invalid && formSubmitted) }">
+                                <div id="startDatePickerReq" class="input-group date">
+                                    <input name="startdate" type="date"
+                                           min="{{projectStartDate | date:'yyyy-MM-dd'}}"
+                                           max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                           class="form-control input-sm" placeholder="YYYY-MM-DD"
+                                           data-ng-model="newStaffReq.startDate" required>
+                                    <span class="input-group-addon adjustSpan"
+                                          elem-ready="enableCalenderReq('startDatePickerReq', 'startdate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                                </div>
+                                <p ng-show="openStaffReq.startdate.$error.date" class="help-block">
+                                    {{errorMessage.date_invalid}}</p>
+                                <p ng-show="openStaffReq.startdate.$error.min" class="help-block">
+                                    {{errorMessage.startdate_invalid_min}}</p>
+                                <p ng-show="openStaffReq.startdate.$error.max" class="help-block">
+                                    {{errorMessage.startdate_invalid_max}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.enddate.$invalid && !openStaffReq.enddate.$pristine ) || (openStaffReq.enddate.$invalid && formSubmitted)}">
+                                <div id="endDatePickerReq" class="input-group date">
+                                    <input name="enddate" type="date"
+                                           min="{{newStaffReq.startDate | date:'yyyy-MM-dd'}}"
+                                           max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                           class="form-control input-sm" placeholder="YYYY-MM-DD"
+                                           data-ng-model="newStaffReq.endDate" required>
+                                    <span class="input-group-addon adjustSpan"
+                                          elem-ready="enableCalenderReq('endDatePickerReq', 'enddate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                                </div>
+                                <p ng-show="openStaffReq.enddate.$error.date" class="help-block">
+                                    {{errorMessage.date_invalid}}</p>
+                                <p ng-show="openStaffReq.enddate.$error.min" class="help-block">
+                                    {{errorMessage.enddate_invalid_min}}</p>
+                                <p ng-show="openStaffReq.enddate.$error.max" class="help-block">
+                                    {{errorMessage.enddate_invalid_max}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <select class="form-control input-sm" name="billableType"
+                                        data-ng-model="newStaffReq.billableType" data-ng-disabled="disableBillable"
+                                        required>
+                                    <option value="BILLABLE" selected="selected">{{label.billable}}</option>
+                                    <option value="NON_BILLABLE">{{label.nonBillable}}</option>
+                                    <option value="SHADOW">{{label.shadow}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.allocation.$invalid && !openStaffReq.allocation.$pristine ) || (openStaffReq.allocation.$invalid && formSubmitted)}">
+                                <input name="allocation" type="number" min="0" max="100"
+                                       class="form-control input-sm" placeholder="% Allocation"
+                                       data-ng-model="newStaffReq.allocation" required>
+                                <p ng-show="openStaffReq.allocation.$error.number" class="help-block">
+                                    {{errorMessage.allocation_invalid}}</p>
+                                <p ng-show="openStaffReq.allocation.$error.min || openStaffReq.allocation.$error.max"
+                                   class="help-block">{{errorMessage.allocation_invalid_minmax}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                    <textarea class="form-control input-sm" rows="2" id="details"
+                                              data-ng-model="newStaffReq.details"></textarea>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td class="glyph edit" colspan="4">
+                            <button title="{{label.add}}" data-ng-click="addEditStaff(0)" type="button"
+                                    class="btn btn-xs btn-success">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                            <button title="{{label.cancel}}" data-ng-click="cancelAddEditReq(0)" type="button"
+                                    class="btn btn-xs btn-danger">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr data-ng-repeat-start="projectStaff in currUnAllocList| filter:opneNeedSearchText track by $index"
+                        data-ng-if="addNew[$index]">
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.title.$invalid && !openStaffReq.title.$pristine) || (openStaffReq.title.$invalid && formSubmitted) }">
+                                <select class="form-control input-sm" name="title" data-ng-model="newStaffReq.title"
+                                        required>
+                                    <option value="">{{label.selectTitle}}</option>
+                                    <option data-ng-repeat="title in titleList" value="{{title}}">{{title}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.competency.$invalid && !openStaffReq.competency.$pristine) || (openStaffReq.competency.$invalid && formSubmitted)}">
+                                <select class="form-control input-sm" name="competency"
+                                        data-ng-model="newStaffReq.competency" required>
+                                    <option value="">{{label.selectCompetency}}</option>
+                                    <option data-ng-repeat="comp in competencies" value="{{comp}}">{{comp}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.startdate.$invalid && !openStaffReq.startdate.$pristine) || (openStaffReq.startdate.$invalid && formSubmitted) }">
+                                <div id="startDatePickerReq" class="input-group date" style="margin-left: -5px">
+                                    <input name="startdate" type="date"
+                                           min="{{projectStartDate | date:'yyyy-MM-dd'}}"
+                                           max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                           class="form-control input-sm" placeholder="YYYY-MM-DD"
+                                           data-ng-model="newStaffReq.startDate" required>
+                                    <span class="input-group-addon adjustSpan"
+                                          elem-ready="enableCalenderReq('startDatePickerReq', 'startdate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                                </div>
+                                <p ng-show="openStaffReq.startdate.$error.date" class="help-block">
+                                    {{errorMessage.date_invalid}}</p>
+                                <p ng-show="openStaffReq.startdate.$error.min" class="help-block">
+                                    {{errorMessage.startdate_invalid_min}}</p>
+                                <p ng-show="openStaffReq.startdate.$error.max" class="help-block">
+                                    {{errorMessage.startdate_invalid_max}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.enddate.$invalid && !openStaffReq.enddate.$pristine ) || (openStaffReq.enddate.$invalid && formSubmitted)}">
+                                <div id="endDatePickerReq" class="input-group date" style="margin-left: 5px">
+                                    <input name="enddate" type="date"
+                                           min="{{newStaffReq.startDate | date:'yyyy-MM-dd'}}"
+                                           max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                           class="form-control input-sm " placeholder="YYYY-MM-DD"
+                                           data-ng-model="newStaffReq.endDate" required>
+                                    <span class="input-group-addon adjustSpan"
+                                          elem-ready="enableCalenderReq('endDatePickerReq', 'enddate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                                </div>
+                                <p ng-show="openStaffReq.enddate.$error.date" class="help-block">
+                                    {{errorMessage.date_invalid}}</p>
+                                <p ng-show="openStaffReq.enddate.$error.min" class="help-block">
+                                    {{errorMessage.enddate_invalid_min}}</p>
+                                <p ng-show="openStaffReq.enddate.$error.max" class="help-block">
+                                    {{errorMessage.enddate_invalid_max}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <select class="form-control input-sm" name="billableType"
+                                        data-ng-model="newStaffReq.billableType" data-ng-disabled="disableBillable"
+                                        required>
+                                    <option value="BILLABLE" selected="selected">{{label.billable}}</option>
+                                    <option value="NON_BILLABLE">{{label.nonBillable}}</option>
+                                    <option value="SHADOW">{{label.shadow}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.allocation.$invalid && !openStaffReq.allocation.$pristine ) || (openStaffReq.allocation.$invalid && formSubmitted)}">
+                                <input name="allocation" type="number" min="0" max="100"
+                                       class="form-control input-sm" placeholder="% Allocation"
+                                       data-ng-model="newStaffReq.allocation" required>
+                                <p ng-show="openStaffReq.allocation.$error.number" class="help-block">
+                                    {{errorMessage.allocation_invalid}}</p>
+                                <p ng-show="openStaffReq.allocation.$error.min || openStaffReq.allocation.$error.max"
+                                   class="help-block">{{errorMessage.allocation_invalid_minmax}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                    <textarea class="form-control input-sm" rows="2" id="details"
+                                              data-ng-model="newStaffReq.details"></textarea>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td class="glyph edit" colspan="4">
+                            <button title="{{label.add}}" data-ng-click="addEditStaff($index)" type="button"
+                                    class="btn btn-xs btn-success">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                            <button title="{{label.cancel}}" data-ng-click="cancelAddEditReq($index)" type="button"
+                                    class="btn btn-xs btn-danger">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr data-ng-repeat-end>
+                        <td>{{projectStaff.title}}</td>
+                        <td style="padding-left: 2%">{{projectStaff.competency}}</td>
+                        <td>{{projectStaff.startDate | date:'MMM d, y'}}</td>
+                        <td>{{projectStaff.endDate | date:'MMM d, y'}}</td>
+                        <td>  <span data-ng-if="projectStaff.billableType === 'BILLABLE'">{{label.billable}}</span>
+                            <span data-ng-if="projectStaff.billableType === 'NON_BILLABLE'">{{label.nonBillable}}</span>
+                            <span data-ng-if="projectStaff.billableType === 'SHADOW'">{{label.shadow}}</span>
+                        </td>
+                        <td>{{projectStaff.allocation}}%</td>
+                        <td class="details-width">
+                            <div class="details-text" style="font-size:12px">{{projectStaff.details}}</div>
+                        </td>
+                        <td>
+                            <div style="position: relative">
+                                <div class="popup linked right" data-ng-show="nominationPopup[$index]"
+                                     style="padding: 15px; z-index: 10000;">
+                                    <span class="close-me" data-ng-click="nominationPopup[$index] = false">x</span>
+
+                                    <table class="table table-bold-head table-striped bbdatatable"
+                                           style="margin-bottom: 10px;">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="3">NOMINATIONS</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr data-ng-repeat="nominatedEmp in projectStaff.nominatedStaffings">
+                                            <td style="white-space: nowrap;">{{nominatedEmp.employeeName}}</td>
+                                            <td>
+                                                <button class="btn btn-xs btn-success"
+                                                        data-ng-click="allocateNominee(projectStaff.id, nominatedEmp.email,nominatedEmp,nominationPopup[$index])">
+                                                    ALLOCATE
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-xs btn-danger"
+                                                        data-ng-click="rejectNomination(projectStaff.id, nominatedEmp.email)">
+                                                    REJECT
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <a href="javascript:void(0);" data-ng-click="nominationPopup[$index] = true"
+                                   class="nominated"
+                                   data-ng-if="projectStaff.state == 'Open' && projectStaff.nominatedStaffings.length > 0">
+                                    {{projectStaff.nominatedStaffings.length}} NOMINATION(S)</a>
+                                <div class="open"
+                                     data-ng-if="projectStaff.state == 'Open' && projectStaff.nominatedStaffings.length == 0">
+                                    OPEN
+                                </div>
+                            </div>
+                        </td>
+                        <td class="glyph">
+                            <button data-ng-disabled="projectStaff.state == 'Closed'" class="btn btn-xs btn-primary"
+                                    data-ng-click="projectAssign(projectStaff.id, projectStaff.competency, projectStaff.nominatedStaffings)">
+                                ASSIGN
+                            </button>
+                        </td>
+                        <td class="glyph">
+                            <button title="{{label.copy}}" data-ng-click="copyRow($index)" type="button"
+                                    class="btn btn-xs btn-primary" style="float: right">
+                                <span class="glyphicon glyphicon-duplicate"></span>
+                            </button>
+                        </td>
+                        <td class="glyph">
+                            <button title="{{label.edit}}" data-ng-click="editRequest($index)" type="button"
+                                    class="btn btn-xs btn-primary" data-ng-disabled="editReqActive">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                        </td>
+                        <td class="glyph">
+                            <button title="{{label.delete}}" data-ng-click="deleteRequest($index);" type="button"
+                                    class="btn btn-xs btn-danger">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr data-ng-if="addNew[currUnAllocList.length] && currUnAllocList.length != 0">
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.title.$invalid && !openStaffReq.title.$pristine) || (openStaffReq.title.$invalid && formSubmitted) }">
+                                <select class="form-control input-sm" name="title" data-ng-model="newStaffReq.title"
+                                        required>
+                                    <option value="">{{label.selectTitle}}</option>
+                                    <option data-ng-repeat="title in titleList" value="{{title}}">{{title}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.competency.$invalid && !openStaffReq.competency.$pristine) || (openStaffReq.competency.$invalid && formSubmitted)}">
+                                <select class="form-control input-sm" name="competency"
+                                        data-ng-model="newStaffReq.competency" required>
+                                    <option value="">{{label.selectCompetency}}</option>
+                                    <option data-ng-repeat="comp in competencies" value="{{comp}}">{{comp}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.startdate.$invalid && !openStaffReq.startdate.$pristine) || (openStaffReq.startdate.$invalid && formSubmitted) }">
+                                <div id="startDatePickerReq" class="input-group date" style="margin-left: -5px">
+                                    <input name="startdate" type="date"
+                                           min="{{projectStartDate | date:'yyyy-MM-dd'}}"
+                                           max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                           class="form-control input-sm" placeholder="YYYY-MM-DD"
+                                           data-ng-model="newStaffReq.startDate" required>
+                                    <span class="input-group-addon adjustSpan"
+                                          elem-ready="enableCalenderReq('startDatePickerReq', 'startdate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                                </div>
+                                <p ng-show="openStaffReq.startdate.$error.date" class="help-block">
+                                    {{errorMessage.date_invalid}}</p>
+                                <p ng-show="openStaffReq.startdate.$error.min" class="help-block">
+                                    {{errorMessage.startdate_invalid_min}}</p>
+                                <p ng-show="openStaffReq.startdate.$error.max" class="help-block">
+                                    {{errorMessage.startdate_invalid_max}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.enddate.$invalid && !openStaffReq.enddate.$pristine ) || (openStaffReq.enddate.$invalid && formSubmitted)}">
+                                <div id="endDatePickerReq" class="input-group date" style="margin-left: -5px">
+                                    <input name="enddate" type="date"
+                                           min="{{newStaffReq.startDate | date:'yyyy-MM-dd'}}"
+                                           max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                           class="form-control input-sm" placeholder="YYYY-MM-DD"
+                                           data-ng-model="newStaffReq.endDate" required>
+                                    <span class="input-group-addon adjustSpan"
+                                          elem-ready="enableCalenderReq('endDatePickerReq', 'enddate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                                </div>
+                                <p ng-show="openStaffReq.enddate.$error.date" class="help-block">
+                                    {{errorMessage.date_invalid}}</p>
+                                <p ng-show="openStaffReq.enddate.$error.min" class="help-block">
+                                    {{errorMessage.enddate_invalid_min}}</p>
+                                <p ng-show="openStaffReq.enddate.$error.max" class="help-block">
+                                    {{errorMessage.enddate_invalid_max}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <select class="form-control input-sm" name="billableType"
+                                        data-ng-model="newStaffReq.billable" data-ng-disabled="disableBillable"
+                                        required>
+                                    <option value="BILLABLE" selected="selected">{{label.billable}}</option>
+                                    <option value="NON_BILLABLE">{{label.nonBillable}}</option>
+                                    <option value="SHADOW">{{label.shadow}}</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div ng-class="{ 'has-error' : (openStaffReq.allocation.$invalid && !openStaffReq.allocation.$pristine ) || (openStaffReq.allocation.$invalid && formSubmitted)}">
+                                <input name="allocation" type="number" min="0" max="100"
+                                       class="form-control input-sm" placeholder="% Allocation"
+                                       data-ng-model="newStaffReq.allocation" required>
+                                <p ng-show="openStaffReq.allocation.$error.number" class="help-block">
+                                    {{errorMessage.allocation_invalid}}</p>
+                                <p ng-show="openStaffReq.allocation.$error.min || openStaffReq.allocation.$error.max"
+                                   class="help-block">{{errorMessage.allocation_invalid_minmax}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                    <textarea class="form-control input-sm" rows="2" id="details"
+                                              data-ng-model="newStaffReq.details"></textarea>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td class="glyph edit" colspan="4">
+                            <button title="{{label.add}}" data-ng-click="addEditStaff(currUnAllocList.length)"
+                                    type="button" class="btn btn-xs btn-success">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                            <button title="{{label.cancel}}"
+                                    data-ng-click="cancelAddEditReq(currUnAllocList.length)" type="button"
+                                    class="btn btn-xs btn-danger">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+
+            <div style="float: left; color: #999999;margin-left: 5px;">Total: {{unAllocatedList.length}} record(s)
+            </div>
+            <div class="pagination-wrap col-md-12" data-ng-show="unAllocatedList.length > itemPerPage"
+                 style="padding:0;">
+                <pagination
+                        data-ng-model="currUnAllocPage"
+                        items-per-page="itemPerPage"
+                        total-items="unAllocatedList.length"
+                        max-size="maxSize"
+                        boundary-links="true"
+                        class="dboard-paginate"
+                >
+                </pagination>
+                <div class="clear:both;"></div>
+            </div>
+            <div class="form-group">
+                <a href="javascript:void(0);">
+                    <button type="button" class="btn bb-button bb-button-secondary" data-ng-click="goBack()">Go Back
+                    </button>
+                </a>
+            </div>
+        </div>
+
+
+    </div>
+    <div data-ng-show="needTabFlag==3">
+        <div style="overflow: visible;margin-top: 5%">
+            <div class="col-md-2 title-container" style="margin-bottom:20px; padding:0;">
+                <div style="display:inline-block;">
+                    <h4 style="margin:0;">{{label.deAllocationTab}}</h4>
+                    <div class="title-border"></div>
+                </div>
+            </div>
+            <div class="col-md-2 table-count"><h5>Total: {{deallocatedStaffing.length}} record(s)</h5></div>
+        </div>
+        <table class="table table-hover table-bold-head table-striped  bbdatatable table-condensed deallocation-table"
+               style="margin-top: 50px;font-size: 12px;">
+            <thead>
+            <tr>
+                <th ng-click="sortedDeallocatedList('allocatedStaffing.employeeName')" style="cursor: pointer"
+                    class="w11">Employee Name <span
+                        class="{{(property=='allocatedStaffing.employeeName')?sortingclass:''}}"></span></th>
+                <th ng-click="sortedDeallocatedList('allocatedStaffing.email')" style="cursor: pointer" class="w20">
+                    Email <span
+                        class="{{(property=='allocatedStaffing.email')?sortingclass:''}}"></span></th>
+                <th ng-click="sortedDeallocatedList('title')" style="cursor: pointer" class="w13">Title <span
+                        class="{{(property=='title')?sortingclass:''}}"></span></th>
+                <th ng-click="sortedDeallocatedList('competency')" style="cursor: pointer" class="w11">Competency <span
+                        class="{{(property=='competency')?sortingclass:''}}"></span></th>
+                <th ng-click="sortedDeallocatedList('startDate')" style="cursor: pointer" class="w11">Start Date <span
+                        class="{{(property=='startDate')?sortingclass:''}}"></span></th>
+                <th ng-click="sortedDeallocatedList('endDate')" style="cursor: pointer" class="w18">End Date <span
+                        class="{{(property=='endDate')?sortingclass:''}}"></span></th>
+                <th class="w11">{{label.billingType}}</th>
+                <th ng-click="sortedDeallocatedList('allocation')" style="cursor: pointer" class="w11">
+                    {{label.allocation}}
+                    <span
+                            class="{{(property=='allocation')?sortingclass:''}}"></span>
+                </th>
+                <th class="w11">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr data-ng-if="deallocatedStaffing.length==0">
+                <td colspan="7">No Deallocation Found</td>
+            </tr>
+
+            <tr data-ng-repeat-start="empDeallocated in deallocatedStaffing track by $index"
+                data-ng-hide="reallocateRow[$index]">
+                <td>{{empDeallocated.allocatedStaffing.employeeName}}</td>
+                <td>{{empDeallocated.allocatedStaffing.email}}</td>
+                <td>{{empDeallocated.title}}</td>
+                <td>{{empDeallocated.competency}}</td>
+                <td>{{empDeallocated.startDate | date:'MMM d, y'}}</td>
+                <td>{{empDeallocated.endDate | date:'MMM d, y'}}</td>
+
+                <td>
+                    <span data-ng-if="empDeallocated.billableType === 'BILLABLE'">{{label.billable}}</span>
+                    <span data-ng-if="empDeallocated.billableType === 'NON_BILLABLE'">{{label.nonBillable}}</span>
+                    <span data-ng-if="empDeallocated.billableType === 'SHADOW'">{{label.shadow}}</span>
+                </td>
+                <td>{{empDeallocated.allocation}}%</td>
+
+                <td>
+                    <button class="btn btn-success btn-sm"
+                            data-ng-click="reallocateStaffing(empDeallocated,$index)"
+                            data-ng-disabled="disable">Re-Allocate
+                    </button>
+                </td>
+            </tr>
+            <tr data-ng-repeat-end data-ng-if="reallocateRow[$index]">
+                <td>{{empDeallocated.allocatedStaffing.employeeName}}</td>
+                <td>{{empDeallocated.allocatedStaffing.email}}</td>
+                <td>{{empDeallocated.title}}</td>
+                <td>{{empDeallocated.competency}}</td>
+                <td>{{empDeallocated.startDate | date:'MMM d, y'}}</td>
+                <td>
+                    <div ng-class="{ 'has-error' : (empDeallocated.enddate.$invalid && !empDeallocated.enddate.$pristine ) || (empDeallocated.enddate.$invalid && submitted)}">
+                        <div id="endDatePickerEmpDelocation" class="input-group date">
+                            <input name="enddate" type="date"
+                                   min="{{projectStartDate.startDate | date:'yyyy-MM-dd'}}"
+                                   max="{{projectEndDate | date:'yyyy-MM-dd'}}"
+                                   class="form-control input-sm" placeholder="YYYY-MM-DD"
+                                   data-ng-model="empDeallocatedEndDate" required>
+                            <span class="input-group-addon adjustSpan"
+                                  elem-ready="enableCalenderDeallocatedEmployee('endDatePickerEmpDelocation', 'enddate')">
+					                    <span class="glyphicon glyphicon-calendar"></span>
+					                </span>
+                        </div>
+                        <p ng-show="empDeallocated.enddate.$error.date" class="help-block">
+                            {{errorMessage.date_invalid}}</p>
+                        <p ng-show="empDeallocated.enddate.$error.min" class="help-block">
+                            {{errorMessage.enddate_invalid_min}}</p>
+                        <p ng-show="empDeallocated.enddate.$error.max" class="help-block">
+                            {{errorMessage.enddate_invalid_max}}</p>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <select class="form-control input-sm"  name="billableType"
+                                data-ng-model="empDeallocated.billableType" data-ng-disabled="disableBillable"
+                                required>
+                            <option value="BILLABLE" selected="selected">{{label.billable}}</option>
+                            <option value="NON_BILLABLE">{{label.nonBillable}}</option>
+                            <option value="SHADOW">{{label.shadow}}</option>
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div ng-class="{ 'has-error' : (empDeallocated.allocation.$invalid && !empDeallocated.allocation.$pristine ) || (empDeallocated.allocation.$invalid && submitted)}">
+                        <input name="allocation" type="number" min="0" max="100"
+                               class="form-control input-sm" placeholder="% Allocation"
+                               data-ng-model="empDeallocated.allocation" required>
+                        <p ng-show="empDeallocated.allocation.$error.number" class="help-block">
+                            {{errorMessage.allocation_invalid}}</p>
+                        <p ng-show="empDeallocated.allocation.$error.min || empDeallocated.allocation.$error.max"
+                           class="help-block">{{errorMessage.allocation_invalid_minmax}}</p>
+                    </div>
+                </td>
+
+                <td>
+                    <div class="row">
+                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Continue
+                        </button>
+
+
+                        <div class="modal fade" id="myModal" role="dialog">
+                            <div class="modal-dialog">
+
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Do You Really Wish To Re-Allocate ?</h4>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button class="btn btn-primary"
+                                                data-ng-click="reallocate(empDeallocated,$index)" data-dismiss="modal">
+                                            Confirm
+                                        </button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <button class="glyphicon glyphicon-remove btn-danger"
+                                data-ng-click="cancelReallocation($index)" style="cursor: pointer"></button>
+                    </div>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+        <div class="form-group">
+            <a href="javascript:void(0);">
+                <button type="button" class="btn bb-button bb-button-secondary" data-ng-click="goBack()">Go Back
+                </button>
+            </a>
+        </div>
+    </div>
+</div>

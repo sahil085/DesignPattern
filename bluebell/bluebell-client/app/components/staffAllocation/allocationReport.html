@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Allocation Report</title>
+</head>
+<body>
+<div data-ng-controller="allocationReportCtrl">
+    <div class="container">
+        <form name="allocationReport" validate>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" style="margin-left: 2px;">Start Date:</label>
+                <div id="reportStartDatePickerReq" class="input-group date col-sm-3">
+                    <input name="startDate" type="date" min="2016-01-01" max="2018-01-31"
+                           class="form-control"
+                           data-ng-model="startDate" required="">
+                    <span class="input-group-addon adjustSpan"
+                          elem-ready="enableCalenderReq('reportStartDatePickerReq','startDate')">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">End Date:</label>
+                <div id="reportEndDatePickerReq" class="input-group date col-sm-3">
+                    <input name="endDate" type="date" min="2016-01-01" max="2018-01-31"
+                           class="form-control ng-pristine ng-empty ng-valid-min ng-valid-max ng-invalid ng-invalid-required ng-touched"
+                           data-ng-model="endDate" required="">
+                    <span class="input-group-addon adjustSpan"
+                          elem-ready="enableCalenderReq('reportEndDatePickerReq', 'endDate')">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <button class="btn btn-info col-sm-6" ng-click="report()">Allocation Report</button>
+            </div>
+        </form>
+
+    </div>
+    <div class="container" style="margin-top: 50px" ng-hide="showTable">
+    <div class="pull-right"><a ng-if="showExportLink" class="btn btn-link"
+                               ng-click="exportToExcel('staffAllocationReportTable')">Export to Excel</a></div>
+    <table id="staffAllocationReportTable" class="table table-hover table-bold-head table-striped table-condensed"
+           style="max-width:300%;width: 300%;margin-left: -7%;font-size: 12px">
+        <thead>
+        <tr>
+            <th class="w15">{{empCode}}</th>
+            <th class="w15">{{name}}</th>
+            <th class="w25">{{email}}</th>
+            <th class="w18">{{designation}}</th>
+            <th class="w16">{{competency}}</th>
+            <th class="w16">{{client}}</th>
+            <th class="w16">{{project}}</th>
+            <th class="w16">{{region}}</th>
+            <th class="w25">{{billableType}}</th>
+            <th class="w15" ng-repeat="date in headerDate track by $index ">
+                {{date | date:'MMM d, y'}}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-ng-repeat="data in reportData">
+            <td>{{data.employee.code}}</td>
+            <td>{{data.employee.name}}</td>
+            <td>{{data.employee.emailAddress}}</td>
+            <td>{{data.employee.title}}</td>
+            <td>{{data.competency}}</td>
+            <td>{{data.clientName}}</td>
+            <td>{{data.projectName?data.projectName:"NA"}}</td>
+            <td>{{data.region}}</td>
+            <td>{{data.reportData[0].billableType}}</td>
+            <td data-ng-repeat="allocation in data.reportData" class="glyph">{{allocation.allocationPercentage/100 | number : 2}}  </td>
+            <td data-ng-if="!data.reportData" class="glyph" data-ng-repeat="date in headerDate track by $index">0.00</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</div>
+</body>
+</html>

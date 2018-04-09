@@ -1,0 +1,100 @@
+<div class="modal-header ">
+    <h2 class="modal-title">Change Mentovisor
+        <button class="btn btn-xs btn-circle btn-danger pull-right" type="button"
+                ng-click="close()"><span class="glyphicon glyphicon-remove"></span></button>
+    </h2>
+</div>
+<div class="modal-body">
+    <div class="col-md-1"></div>
+    <div class=" col-md-10 alert alert-warning">
+        <div>
+            <div style="margin: 5px;">
+                <span class="glyphicon glyphicon-warning-sign" style="font-size: 15px;"></span>
+                <span style="margin-left:5px">Making this change will activate a notification to the employee</span>
+            </div>
+        </div>
+    </div>
+    <form method="post" novalidate>
+        <div class="row">
+            <label class="col-md-3">Current Mentovisor</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control" name="email" id="email" data-ng-model="mentovisorEmail"
+                       ng-keydown="setEmployeeRegion()" required=""
+                       typeahead="email for email in emailList | filter:mentovisorEmail| limitTo:10" autofocus>
+
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10%;">
+            <label class="col-md-3">Employee Region</label>
+            <div class="col-md-4">
+                <select class="form-control" ng-model="region">
+                    <option data-ng-repeat="region in regionList" value="{{region}}">{{region}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 10%;">
+            <label class="col-md-3">Performance Reviewer</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control" name="performanceReviewerEmail"
+                       data-ng-model="performanceReviewerEmail" required=""
+                       typeahead="email for email in emailList | filter:performanceReviewerEmail| limitTo:10" autofocus>
+            </div>
+        </div>
+        <div class=" row" data-ng-show="isDeallocate" style="margin-top: 10%;">
+            <label class="col-md-3 ">Last Working Date:</label>
+            <div class="col-md-4">
+                <div id="reportStartDatePickerReq" class="input-group date">
+                    <input name="lastWorkingDate" type="date" min="2016-01-01" max="{{maxDate}}"
+                           class="form-control"
+                           data-ng-model="lastWorkingDate" required="required">
+                    <span class="input-group-addon adjustSpan"
+                          elem-ready="enableCalenderReq('reportStartDatePickerReq','lastWorkingDate')">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div data-ng-show="lastworkingDateIncorrectStartDate" class="alert-danger col-md-9">Deallocation Date Cannot Be Less Than Start Date
+        </div>
+        <div data-ng-show="lastworkingDateIncorrect" class="alert-danger col-md-9">Date Is Mandatory Field And Date
+            Should Be Less Than Today's Date
+        </div>
+        <div class="row" style="margin-top: 10%;">
+            <div class="col-md-3"></div>
+            <div class="col-md-12" data-ng-show="!isDeallocate">
+                <div class="col-md-12">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-4" style="
+    padding: 0px;
+">
+                        <input type="submit" class="btn btn-success form-control" ng-click="allocate()"
+                               value="{{label.update}}" style="
+                       margin-top: 30px;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" data-ng-show="isDeallocate">
+                <div class="col-md-12">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-4" style="
+    padding: 0px;
+">
+                        <input type="submit" class="btn btn-success form-control"
+                               ng-click="deAllocate()"
+                               value="{{label.update}}" style="
+                       margin-top: 30px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div><br/>
+
+
+<div class="modal-footer" style="margin-top: 15%;">
+</div>
+<div id="spinner" data-ng-show="showSpinner">
+    <img src="assets/images/spinner.gif" style="width: 99%;
+    left: 34%;height:50%">
+</div>

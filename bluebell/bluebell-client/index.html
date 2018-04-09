@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>BlueBell</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link id="page_favicon" href="assets/images/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+
+    <script type="text/javascript" src="assets/js/angular.min.js"></script>
+    <script type="text/javascript" src="assets/js/d3.min.js"></script>
+    <script type="text/javascript" src="assets/js/nv.d3.min.js"></script>
+    <script type="text/javascript" src="assets/js/angular-nvd3.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/angular-route.js"></script>
+    <script type="text/javascript" src="assets/js/angular-cookies.js"></script>
+    <script type="text/javascript" src="assets/js/ui-bootstrap-tpls-0.12.1.min.js"></script>
+    <script type="text/javascript" src="assets/js/checklist-model.js"></script>
+    <script type="text/javascript" src="assets/js/rzslider.min.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/js/moment-with-locales.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap-multiselect.js"></script>
+    <script type="text/javascript" src="assets/js/ngDialog.min.js"></script>
+    <script type="text/javascript" src="assets/js/tableExport.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.base64.js"></script>
+    <!--<script type="text/javascript" src="assets/js/datatables.min.js"></script>-->
+    <script type="text/javascript" src="app/bb-app.js"></script>
+    <script type="text/javascript" src="app/router/router.js"></script>
+    <script type="text/javascript" src="app/shared/topNav/topNavCtrl.js"></script>
+    <script type="text/javascript" src="app/components/project/projectCtrl.js"></script>
+    <script type="text/javascript" src="app/components/project/billing-info/fixedProjectCtrl.js"></script>
+    <script type="text/javascript" src="app/components/project/billing-info/tnmProjectCtrl.js"></script>
+    <script type="text/javascript" src="app/components/project/staff-request/staffReqCtrl.js"></script>
+    <script type="text/javascript" src="app/shared/processStep/processStepCtrl.js"></script>
+    <script type="text/javascript" src="app/components/project/projectListCtrl.js"></script>
+    <script type="text/javascript" src="app/components/staffAllocation/allocationReportCtrl.js"></script>
+    <script type="text/javascript" src="app/components/client/clientCtrl.js"></script>
+    <script type="text/javascript" src="app/components/client/clientListCtrl.js"></script>
+    <script type="text/javascript" src="app/components/client/country-js/ng-country-select.js"></script>
+    <script type="text/javascript" src="app/components/staffingNeeds/staffingNeeds.js"></script>
+    <script type="text/javascript" src="app/components/staffingNeeds/openNeedsCtrl.js"></script>
+    <script type="text/javascript" src="app/components/staffAllocation/staffAllocationCtrl.js"></script>
+    <script type="text/javascript" src="app/components/staffAllocation/resignationDetailCtrl.js"></script>
+    <script type="text/javascript" src="app/components/staffAllocation/resignationCtrl.js"></script>
+    <script type="text/javascript" src="app/components/staffAllocation/changeMentovisorCtrl.js"></script>
+    <script type="text/javascript" src="app/components/staffAllocation/employeeAllocation.js"></script>
+    <script type="text/javascript" src="app/components/staffAllocation/employeeSearchCrtl.js"></script>
+    <script type="text/javascript" src="app/components/staffAllocation/showLeaveSummaryCtrl.js"></script>
+    <script type="text/javascript" src="app/components/userRole/userMappingCtrl.js"></script>
+    <script type="text/javascript" src="app/components/userRole/assignRolesCtrl.js"></script>
+    <script type="text/javascript" src="app/components/dashboard/graphCtrl.js"></script>
+    <script type="text/javascript" src="app/components/upcomingDeallocation/upComingDeallocationCtrl.js"></script>
+    <script type="text/javascript" src="app/components/dataUpload/dataUploadCtrl.js"></script>
+    <script type="text/javascript" src="app/components/bench/benchCtrl.js"></script>
+    <script type="text/javascript" src="app/components/bench/nonBillable.js"></script>
+    <script type="text/javascript"
+            src="app/components/mentovisorAndPerformanceReviewer/mentovisorAndPerformanceReviewer.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/ngDialog.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/ngDialog-theme-plain.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/ngDialog-theme-default.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/rzslider.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap-multiselect.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/radio.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/nv.d3.min.css">
+    <!--<link rel="stylesheet" type="text/css" href="assets/css/datatables.min.css">-->
+
+</head>
+<body data-ng-app="bb-app" data-ng-controller="MainCtrl">
+
+<div class="content-wrapper" data-ng-class="{'toggled' : sideMenuActive}">
+
+    <div id="sidebar-wrapper" data-ng-show="loginSuccess">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <div class="navbar-header logo">
+                    <div class="navbar-brand" style="padding-left:0;">Blue<span>Bell</span></div>
+                </div>
+            </li>
+            <li>
+                <a class="menu-link" href="#/">Dashboard</a>
+            </li>
+            <li data-ng-if="loggedUser.currentRole != 'SALES LEAD' && loggedUser.currentRole != 'HRBP'">
+                <a class="menu-link" href="#/listProjects">Projects</a>
+            </li>
+            <li data-ng-if="loggedUser.currentRole != 'SALES LEAD' && loggedUser.currentRole != 'HRBP'">
+                <a class="menu-link" href="#/listClients">Clients</a>
+            </li>
+            <li>
+                <a class="menu-link" href="#/employeeSearch">Employee Search</a>
+            </li>
+            <li>
+                <a class="menu-link" href="#/openNeeds">Open Needs</a>
+            </li>
+            <li>
+                <a class="menu-link" href="#/bench">Bench</a>
+            </li>
+            <li data-ng-if="loggedUser.currentRole != 'SALES LEAD' && loggedUser.currentRole != 'HRBP'">
+                <a class="menu-link" href="#/mentovisorAndPerformanceReviewer">Performance Reviewer</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="page-content-wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <header data-ng-include="'app/shared/topNav/topNav.html'" data-ng-show="loginSuccess"></header>
+
+                    <div id="spinner" data-ng-show="showSpinner">
+                        <img src="assets/images/spinner.gif">
+                    </div>
+                    <div class="main-content" data-ng-class="{'container' : !sideMenuActive}">
+                        <div data-ng-if="showCreateSteps"
+                             data-ng-include="'app/shared/processStep/processStep.html'"></div>
+                        <div data-ng-view></div>
+                        <div class="loader"><img src="assets/images/spinner.gif"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<div data-ng-controller="mentovisorAndPerformanceReviewer">
+    <div id="dialog-spinner" data-ng-show="showDialogSpinner">
+        <img src="assets/images/spinner.gif">
+    </div>
+    <div class="container mt-40 mb-20 performance-table">
+
+        <div class="table-responsive" style="overflow: visible;">
+
+            <div class="col-md-5 title-container" style="margin-bottom:20px; padding:0;">
+                <div style="display:inline-block;">
+                    <h3 style="margin:0;">{{label.open_needs}}</h3>
+                    <div class="title-border" style="float:none;"></div>
+                </div>
+            </div>
+            <div class="col-md-2" style="padding: 0; ">
+                <input class="form-control" type="text" placeholder="Search" data-ng-model="searchText">
+            </div>
+            <div class="col-md-2" style=" padding: 0;margin-left: 2px">
+                <select class="form-control " data-ng-change="competencyChanged()" data-ng-model="competency" required>
+                    <option value="">All Competency</option>
+                    <option data-ng-repeat="competency in competencyList" value="{{competency}}">{{competency}}</option>
+                </select>
+            </div>
+
+            <div class="col-md-2" style=" padding: 0;margin-left: 2px">
+                <select class="form-control" ng-change="regionChanged()" ng-model="region">
+                    <option value="">All Regions</option>
+                    <option data-ng-repeat="region in regionList" value="{{region}}">{{region}}</option>
+                </select>
+            </div>
+
+            <table class="table table-hover table-bold-head table-striped  bbdatatable table-condensed">
+                <thead>
+                <tr>
+
+                    <th class="w11" ng-click="sortedList('menteename')" style="cursor: pointer">
+                        {{label.employeeName}}<span
+                            class="{{(property=='menteename')?sortingclass:''}}"></span>
+                    </th>
+                    <th class="w11" ng-click="sortedList('menteeCode')" style="cursor: pointer">
+                        {{label.employeeCode}}<span
+                            class="{{(property=='menteeCode')?sortingclass:''}}"></span>
+                    </th>
+                    <th class="w11" ng-click="sortedList('menteeRegion')" style="cursor: pointer">
+                        {{label.employeeRegion}} <span
+                            class="{{(property=='menteeRegion')?sortingclass:''}}"></span>
+                    </th>
+                    <th class="w16" ng-click="sortedList('menteeCompetency.name')" style="cursor: pointer">
+                        {{label.employeeCompetency}} <span
+                            class="{{(property=='menteeCompetency.name')?sortingclass:''}}"></span>
+                    </th>
+                    <th ng-click="sortedList('emailAddress')" style="cursor: pointer" class="w20">
+                        {{label.mentovisorEmail}}<span class="{{(property=='emailAddress')?sortingclass:''}}"></span>
+                    </th>
+                    <th class="w20" ng-click="sortedList('performanceReviewerEmail')" style="cursor: pointer">
+                        {{label.performanceReviewer}} <span
+                            class="{{(property=='performanceReviewerEmail')?sortingclass:''}}"></span>
+                    </th>
+
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr data-ng-if="employeeandMentovisorList.length==0">
+                    <td colspan="7">{{label.onPageLoad}}</td>
+                </tr>
+
+                <tr data-ng-repeat="empAndMentovisor in employeeandMentovisorList | filter:searchText track by $index">
+                    <td>{{empAndMentovisor.menteename}}</td>
+                    <td>{{empAndMentovisor.menteeCode}}</td>
+                    <td>{{empAndMentovisor.menteeRegion}}</td>
+                    <td>{{empAndMentovisor.menteeCompetency.name}}</td>
+                    <td>{{empAndMentovisor.emailAddress}}</td>
+                    <td>{{empAndMentovisor.performanceReviewerEmail}}</td>
+                    <td>
+                        <button class="btn btn-success btn-xs"
+                                data-ng-click="changeMentovisor(empAndMentovisor.menteename,empAndMentovisor.menteeCode)">
+                            Change Mentovisor
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>

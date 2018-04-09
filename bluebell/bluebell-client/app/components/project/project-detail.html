@@ -1,0 +1,114 @@
+<div class="form-container" data-ng-controller="projectCtrl">
+    <form name="project" action="post" class="form-horizontal" novalidate>
+        <div class="form-group">
+            <div class="radio radio-info">
+                <input data-ng-model="formData.projectType" name="projectType" type="radio" value="Billable"
+                       data-ng-checked="true" data-ng-click="showBillingType(true)" data-ng-disabled="mode == 'UPDATE'"><label>{{label.billableProject}}</label>
+            </div>
+            <div class="radio radio-info">
+                <input data-ng-model="formData.projectType" name="projectType" type="radio" value="NonBillable"
+                       data-ng-click="showBillingType(false)" data-ng-disabled="mode == 'UPDATE'"><label>{{label.nonBillableProject}}</label>
+            </div>
+        </div>
+        <div class="form-group" data-ng-show="isBillable">
+            <div class="radio radio-info">
+                <input data-ng-model="formData.billingType" name="billingType" type="radio" value="FixedPrice"
+                       data-ng-checked="true"
+                       data-ng-disabled="mode == 'UPDATE'"><label>{{label.fixedPriceProject}}</label>
+            </div>
+            <div class="radio radio-info">
+                <input data-ng-model="formData.billingType" name="billingType" type="radio" value="TimeAndMoney"
+                       data-ng-disabled="mode == 'UPDATE'"><label>{{label.timeAndMoneyProject}}</label>
+            </div>
+        </div>
+        <div class="form-group"
+             ng-class="{ 'has-error' : project.projectName.$invalid && !project.projectName.$pristine }">
+            <label class="control-label col-md-3">{{label.projectName}}</label>
+            <div class="col-md-6">
+                <input data-ng-model="formData.projectName" name="projectName" type="text" class="form-control"
+                       placeholder="Enter Project Name" data-ng-blur="checkProjectName(formData.projectName)"
+                       data-ng-disabled="mode == 'UPDATE'" required>
+                <p ng-show="project.projectName.$invalid && !project.projectName.$pristine && !projectNameExists"
+                   class="help-block">{{errorMessage.project_name_required}}</p>
+                <p ng-show="project.projectName.$invalid && projectNameExists" class="help-block">
+                    {{errorMessage.project_name_invalid}}</p>
+            </div>
+        </div>
+        <div class="form-group"
+             ng-class="{ 'has-error' : project.clientName.$invalid && !project.clientName.$pristine }">
+            <label class="control-label col-md-3">{{label.clientName}}</label>
+            <div class="col-md-6">
+                <select class="form-control" name="clientName" data-ng-model="formData.client.clientId" required>
+                    <option value="">{{label.pleaseSelect}}</option>
+                    <option data-ng-repeat="client in clientList" value="{{client.clientId}}">{{client.clientName}}
+                    </option>
+                </select>
+                <p ng-show="project.clientName.$invalid && !project.clientName.$pristine" class="help-block">
+                    {{errorMessage.client_name_required}}</p>
+            </div>
+            <div class="col-md-3" style="text-align:left;">
+                <a href="#client" class="btn btn-primary bb-button bb-button-small">{{label.addClient}}</a>
+            </div>
+        </div>
+        <div class="form-group"
+             ng-class="{ 'has-error' : project.businessUnit.$invalid && !project.businessUnit.$pristine }">
+            <label class="control-label col-md-3">{{label.businessUnit}}</label>
+            <div class="col-md-6">
+                <select class="form-control" name="businessUnit" data-ng-model="formData.businessUnit" required>
+                    <option value="">{{label.pleaseSelect}}</option>
+                    <option data-ng-repeat="option in bu" value="{{option}}">{{option}}</option>
+                </select>
+                <p ng-show="project.businessUnit.$invalid && !project.businessUnit.$pristine" class="help-block">
+                    {{errorMessage.bu_required}}</p>
+            </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : project.region.$invalid && !project.region.$pristine }">
+            <label class="control-label col-md-3">{{label.region}}</label>
+            <div class="col-md-6">
+                <select class="form-control" name="region" data-ng-model="formData.regionvalue.regionName" required>
+                    <option value="">{{label.pleaseSelect}}</option>
+                    <option data-ng-repeat="region in regionList" value="{{region}}">{{region}}</option>
+                </select>
+                <p ng-show="project.region.$invalid && !project.region.$pristine" class="help-block">
+                    {{errorMessage.region_required}}</p>
+            </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : project.startDate.$invalid && !project.startDate.$pristine }">
+            <label class="control-label col-md-3">{{label.startDate}}</label>
+            <div class="col-md-6">
+                <div class="input-group date" id="startDatePicker">
+                    <input data-ng-model="formData.startDate" name="startDate" type="date" class="form-control"
+                           placeholder="YYYY-MM-DD" required/>
+                    <span class="input-group-addon">
+	                    <span class="glyphicon glyphicon-calendar"></span>
+	                </span>
+                </div>
+                <p ng-show="project.startDate.$error.required && !project.startDate.$pristine" class="help-block">
+                    {{errorMessage.startDate_required}}</p>
+                <p ng-show="project.startDate.$error.date" class="help-block">{{errorMessage.startDate_invalid}}</p>
+            </div>
+        </div>
+        <div class="form-group" ng-class="{ 'has-error' : project.endDate.$invalid && !project.endDate.$pristine }">
+            <label class="control-label col-md-3">{{label.endDate}}</label>
+            <div class="col-md-6">
+                <div class="input-group date" id="endDatePicker">
+                    <input data-ng-model="formData.endDate" min="{{formData.startDate | date:'yyyy-MM-dd'}}"
+                           name="endDate" type="date" class="form-control" placeholder="YYYY-MM-DD"/>
+                    <span class="input-group-addon">
+	                    <span class="glyphicon glyphicon-calendar"></span>
+	                </span>
+                </div>
+                <p ng-show="project.endDate.$error.date" class="help-block">{{errorMessage.endDate_invalid}}</p>
+                <p ng-show="project.endDate.$error.min" class="help-block">{{errorMessage.endDate_invalid_min}}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <input data-ng-show="mode == 'CREATE'" type="button" ng-disabled="project.$invalid"
+                   class="btn btn-primary bb-button" value="Continue" data-ng-click="continue()">
+            <input data-ng-show="mode == 'UPDATE'" type="button" ng-disabled="project.$invalid || project.$pristine"
+                   class="btn btn-primary bb-button" value="Update" data-ng-click="update()">
+            <input data-ng-show="mode == 'UPDATE' && isBillable" type="button" class="btn btn-primary bb-button"
+                   value="Next" data-ng-click="next()">
+        </div>
+    </form>
+</div>

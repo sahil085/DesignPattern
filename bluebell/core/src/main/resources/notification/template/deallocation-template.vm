@@ -1,0 +1,24 @@
+<html>
+<body>
+<br>
+<div>
+    Dear ${spoc},
+</div>
+<br>
+<div>
+    The following deallocations have happened in your region:
+
+</div>
+<br/>
+<div>
+
+    <ul>
+        <li><strong>Project:</strong> ${project}</li>
+        <li><strong>Employee Name:</strong>${receiver}</li>
+        <li><strong>Start Date:</strong>${startStaffingDate}</li>
+        <li><strong>End Date:</strong>${lastStaffingDate}</li>
+    </ul>
+
+</div>
+</body>
+</html>

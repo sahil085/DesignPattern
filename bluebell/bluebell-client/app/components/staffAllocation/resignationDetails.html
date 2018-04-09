@@ -1,0 +1,21 @@
+
+    <div class="modal-header ">
+        <h3 class="modal-title">Employee Resignation Details
+            <button class="btn btn-xs btn-circle btn-danger pull-right" type="button"
+                    ng-click="close()"><span class="glyphicon glyphicon-remove"></span></button>
+        </h3>
+    </div>
+    <div class="modal-body">
+    <div>
+        <strong>Last Working Day : </strong>{{emp.lastWorkingDate |  date:'MMM d, y'}}
+    </div>
+    <div>
+        <strong>Initiation Date : </strong>{{emp.initiationDate |  date:'MMM d, y'}}
+    </div>
+    <div>
+        <strong>Notice Period : </strong> {{emp.noticePeriod}} days
+    </div>
+    </div>
+    <div class="modal-footer">
+
+    </div>

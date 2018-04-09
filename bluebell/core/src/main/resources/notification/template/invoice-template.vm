@@ -1,0 +1,11 @@
+<html>
+<body>
+<div>
+    Dear ${receiver},
+</div>
+<br>
+<div>
+    Please send invoice to client for project ${project}. For further information please get in contact with ${spoc}.
+</div>
+</body>
+</html>

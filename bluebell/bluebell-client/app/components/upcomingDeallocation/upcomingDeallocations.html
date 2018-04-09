@@ -1,0 +1,155 @@
+<div data-ng-controller="upcomingDeallocationCtrl">
+    <div>
+
+        <div class="table-responsive" style="overflow: visible;">
+
+            <div class="col-md-3 title-container" style="margin-bottom:20px; padding:0;">
+                <div style="display:inline-block;">
+                    <h3 style="margin:0;">{{label.benchLabel}}</h3>
+                    <div class="title-border" style="float:none;"></div>
+                </div>
+            </div>
+
+            <div class="col-md-2 table-count"><h4>Total: {{benchList.length}} record(s)</h4></div>
+            <div class="col-md-3"><h4>Include Resigned : <input type="checkbox" style="width: 15px;height: 15px;margin-top: 2px" data-ng-model="benchResignFilter" data-ng-click="resignationFilter(true)">
+            </h4></div>
+            <div class="col-md-2" style="float:right; padding: 0; margin-left: 10px;" data-ng-show="role != 'REGION HEAD'">
+                <select class="form-control" data-ng-change="competencyChanged()" data-ng-model="competency">
+                    <option value="">All Competency</option>
+                    <option data-ng-repeat="competency in competenciesList" value="{{competency}}">{{competency}}</option>
+                </select>
+            </div>
+
+            <table class="table table-hover table-bold-head table-striped  bbdatatable table-condensed">
+                <thead>
+                <tr>
+                    <th ng-click="sortedList('code',false)" style="cursor: pointer" class="w16">{{label.empCode}}<span class="{{(property=='code')?sortingclass:''}}"></span></th>
+                    <th ng-click="sortedList('name',false)" style="cursor: pointer" class="w16">{{label.employeename}}<span class="{{(property=='name')?sortingclass:''}}"></span></th>
+                    <th ng-click="sortedList('emailAddress',false)" style="cursor: pointer" class="w20">{{label.email}}<span class="{{(property=='emailAddress')?sortingclass:''}}"></span></th>
+                    <th ng-click="sortedList('title',false)" style="cursor: pointer" class="w16">{{label.title}}<span class="{{(property=='title')?sortingclass:''}}"></span></th>
+                    <th ng-click="sortedList('competency.name',false)" style="cursor: pointer" class="w16">{{label.competency}}<span class="{{(property=='competency.name')?sortingclass:''}}"></span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr data-ng-if="benchList.length==0">
+                    <td colspan="4">No Data Found</td>
+                </tr>
+
+                <tr data-ng-repeat="employee in currBenchList  track by $index">
+                    <td>{{employee.code}}</td>
+                    <td>{{employee.name}}<span data-ng-if="employee.resign" style="margin-left: 1px;cursor: pointer" class="badge badge-pill alert-danger" data-ng-click="resigntionDetails(employee)">Resigned</span></td>
+                    <td>{{employee.emailAddress}}</td>
+                    <td>{{employee.title}}</td>
+                    <td>{{employee.competency.name}}</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div style="float: left; color: #999999;margin-left: 5px;">&nbsp;</div> <!-- Todo: Find a way to remove this-->
+            <div class="pagination-wrap col-md-12" data-ng-show="benchList.length > itemPerPage" style="padding:0;">
+                <pagination
+                        data-ng-model="currBenchPage"
+                        items-per-page="itemPerPage"
+                        total-items="benchList.length"
+                        max-size="maxSize"
+                        boundary-links="true"
+                        class="dboard-paginate"
+                >
+                </pagination>
+                <div class="clear:both;"></div>
+            </div>
+
+        </div>
+
+        <div class="clearfix" style="margin-bottom: 20px;"></div>
+        <div class="table-responsive" style="overflow: visible;">
+
+            <div class="col-md-3 title-container" style="margin-bottom:20px; padding:0;">
+                <div style="display:inline-block;">
+                    <h3 style="margin:0;">{{label.upcomingDeallocations}}</h3>
+                    <div class="title-border" style="float:none;"></div>
+                </div>
+            </div>
+            <div class="col-md-2 table-count"><h4>Total: {{upcomingDeallocationsList.length}} record(s)</h4></div>
+            <div class="col-md-2"><h5>Include Resigned : <input type="checkbox" style="width: 15px;height: 15px;margin-top: 2px" data-ng-model="upcmgDellresignFilter" data-ng-click="resignationFilter(false)">
+            </h5></div>
+            <div class="row col-md-5" style="float: right">
+            <div class="col-md-4"   data-ng-show="role != 'REGION HEAD'">
+                <select class="form-control" data-ng-change="regionChanged()" data-ng-model="region">
+                    <option value="">All Regions</option>
+                    <option data-ng-repeat="region in regionList" value="{{region}}">{{region}}</option>
+                </select>
+            </div>
+
+            <div class="col-md-4" style="padding: 0px" data-ng-show="role != 'REGION HEAD'">
+                <select class="form-control" data-ng-change="upcomingDeallocationCompetencyFilterChanged()" data-ng-model="upcomingDeallocationCompetency" style="width: 98%;">
+                    <option value="">All Competency</option>
+                    <option data-ng-repeat="competency in competenciesList" value="{{competency}}">{{competency}}</option>
+                </select>
+            </div>
+
+            <div class="col-md-4" style="float: right;padding: 0;">
+                <select class="form-control" style="width: 83%;" data-ng-change="rangeChanged()" data-ng-model="duration">
+                    <option data-ng-repeat="range in dayRange" value="{{range.key}}">{{range.value}}</option>
+                </select>
+            </div>
+            </div>
+
+
+            <table class="table table-hover table-bold-head table-striped  bbdatatable table-condensed">
+                <thead>
+                <tr>
+                    <th ng-click="sortedList('projectName',true)" style="cursor: pointer" class="w18">{{label.projectName}}<span class="{{(property=='projectName')?sortingclass:''}}"></span></th>
+                    <th ng-click="sortedList('region',true)" style="cursor: pointer" class="w10">{{label.region}}<span class="{{(property=='region')?sortingclass:''}}"></span></th>
+                    <th ng-click="sortedList('competency',true)" style="cursor: pointer" class="w15">{{label.competency}}<span class="{{(property=='competency')?sortingclass:''}}"></span></th>
+                    <th ng-click="sortedList('employeeName',true)" style="cursor: pointer" class="w18">{{label.employeename}}<span class="{{(property=='employeeName')?sortingclass:''}}"></span></th>
+                    <th ng-click="sortedList('title',true)" style="cursor: pointer" class="w11">{{label.title}}<span class="{{(property=='title')?sortingclass:''}}"></span></th>
+                    <th class="w9">{{label.billable}}</th>
+                    <th ng-click="sortedList('date',true)" style="cursor: pointer" class="w22">{{label.deallocationDate}}<span class="{{(property=='date')?sortingclass:''}}"></span></th>
+                    <th class="w13"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr data-ng-if="upcomingDeallocationsList.length==0">
+                    <td colspan="7">No Data Found</td>
+                </tr>
+
+                <tr data-ng-repeat="projectStaff in currList  track by $index">
+                    <td>{{projectStaff.projectName}}</td>
+                    <td>{{projectStaff.region}}</td>
+                    <td>{{projectStaff.competency}}</td>
+                    <td>{{projectStaff.employeeName}}<span data-ng-if="projectStaff.resign" style="margin-left: 1px;cursor: pointer" class="badge badge-pill alert-danger" data-ng-click="resigntionDetails(projectStaff)">Resigned</span></td>
+                    <td>{{projectStaff.title}}</td>
+                    <td>  <span data-ng-if="projectStaff.billableType === 'BILLABLE'"
+                                class='glyphicon glyphicon-ok-circle ' data-toggle="tooltip" title="Billable"></span>
+                        <span data-ng-if="projectStaff.billableType === 'NON_BILLABLE'"
+                              class='glyphicon glyphicon-remove-circle ' data-toggle="tooltip" title="Non Billable"></span>
+                        <span data-ng-if="projectStaff.billableType === 'SHADOW'"
+                              class='glyphicon glyphicon-ban-circle ' data-toggle="tooltip" title="Shadow"></span>
+                    </td>                    <td>{{projectStaff.date | date:'MMM d, y'}}</td>
+                    <td data-ng-if="role != 'SALES LEAD'" class="glyph">
+                        <button title="{{label.edit}}" data-ng-click="navigate(projectStaff.projectId)" type="button" class="btn btn-xs btn-primary">
+                            GO TO STAFFING
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div style="float: left; color: #999999;margin-left: 5px;">&nbsp;</div> <!-- Todo: Find a way to remove this-->
+            <div class="pagination-wrap col-md-12" data-ng-show="upcomingDeallocationsList.length > itemPerPage" style="padding:0;">
+                <pagination
+                        data-ng-model="currPage"
+                        items-per-page="itemPerPage"
+                        total-items="upcomingDeallocationsList.length"
+                        max-size="maxSize"
+                        boundary-links="true"
+                        class="dboard-paginate"
+                >
+                </pagination>
+                <div class="clear:both;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+<div data-ng-controller="userRoleMappingCtrl">
+	<div class="mt-40">
+		<div class="text-right">
+			<a href="javascript:void(0);"><button type="button" class="btn btn-primary bb-button" data-ng-click="assignRoles()">User Role Mapping</button></a>
+		</div>
+		<div class="table-responsive  mt-20">
+			<table class="table table-hover table-bold-head table-striped bbdatatable ">
+				<thead>
+					<tr>
+						<th>{{label.userName}}</th>
+						<th>{{label.email}}</th>
+						<th>{{label.userRole}}</th>
+                        <th>{{label.userRegion}}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr data-ng-repeat="authority in authorityList">
+						<td>{{authority.employee.name}}</td>
+                        <td>{{authority.email}}</td>
+						<td>
+                            <div data-ng-repeat="role in authority.roles">{{role}}&nbsp;&nbsp;</div>
+                        </td>
+                        <td>
+                            <div data-ng-repeat="region in authority.regions">{{region}}&nbsp;&nbsp;</div>
+                        </td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
